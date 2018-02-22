@@ -22,12 +22,24 @@ class Root {
 
   createPostRoute() {
     this.router.post(endpoint, (req, res) => {
+      let sendError = (message, code = 400) => {
+        res.status(code).send(message);
+      };
+
       let uris = req.body.uris;
-      let hosts =  req.body.hosts.trim().split(',');
+      let hosts =  validate.isString(req.body.hosts)
+        ? req.body.hosts.trim().split(',')
+        : undefined;
       let methods = validate.isString(req.body.methods)
-        ?  req.body.methods.trim().split(',')
+        ? req.body.methods.trim().split(',')
         : undefined
       ;
+
+      let requiredParameters = validate({api_model: [uris, hosts, methods]}, {api_model: {at_least: { requirement: 1, required: 'uris, hosts or methods'} }});
+
+      if (requiredParameters !== undefined) {
+        sendError(requiredParameters);
+      }
 
       let ApisModel = new baseModel({
         name: req.body.name,
@@ -49,10 +61,9 @@ class Root {
 
       if (validateModel !== undefined) {
         // @todo throw error validator
-        res.status(400).send(validateModel);
+        sendError(validateModel);
       }
 
-      console.log(validateModel);
       res.status(200).send();
     })
   }

@@ -1,24 +1,20 @@
 class ValidUrls {
   constructor(validate) {
-    validate.validators.valid_urls = (value, options, key) => {
+    validate.validators.valid_urls = (value) => {
       if (!validate.isArray(value)) {
-        return validate.format("must be a array, %{value} provided.", {
-          value: typeof value,
-        });
+        return undefined;
       }
 
       let valid = true;
       value.every((element) => {
         let urlValidate = validate({ val: element }, { val: { url: true }});
         if (urlValidate !== undefined) {
-          return valid = false;
+          valid = false;
         }
       });
 
-      if (value) return undefined;
-      return validate.format("must be a array, %{value} provided.", {
-        value: typeof value,
-      });
+      if (valid) return undefined;
+      return validate.format("must have valid urls.");
     };
   }
 }

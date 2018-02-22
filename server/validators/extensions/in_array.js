@@ -2,10 +2,12 @@ const validHttpVerbs = ["GET", "POST", "PUT", "PATCH", "HEAD", "OPTIONS", "DELET
 
 class InArray {
   constructor(validate) {
-    validate.validators.in_array = (value, options, key) => {
+    validate.validators.in_array = (value, options) => {
       if (options.within === undefined) {
         return undefined;
       }
+
+      if (value === undefined) return undefined;
 
       let valid = value.some(r => options.within.indexOf(r) >= 0);
       if (valid) return undefined;
